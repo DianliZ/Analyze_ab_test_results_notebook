@@ -124,7 +124,8 @@ These questions are the difficult parts associated with A/B tests in general.
 
 1. For now, consider you need to make the decision just based on all the data provided. If you want to assume that the old page is better unless the new page proves to be definitely better at a Type I error rate of 5%, what should your null and alternative hypotheses be? You can state your hypothesis in terms of words or in terms of  pold  and  pnew , which are the converted rates for the old and new pages.
 
-Put your answer here.
+$H_0:$ $p_{old} \geq p_{new}$ <br><br>
+$H_1:$ $p_{old} < p_{new}$
 
 2. Assume under the null hypothesis,  pnew  and  pold  both have "true" success rates equal to the converted success rate regardless of page - that is  pnew and  pold  are equal. Furthermore, assume they are equal to the converted rate in ab_data.csv regardless of the page. 
 
