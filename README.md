@@ -285,12 +285,15 @@ from scipy.stats import norm
 
 norm.cdf(z_score)
 ```
-# 0.9999999383005862 # Tells us how significant our z-score is
+0.9999999383005862 
+##### Tells us how significant our z-score is
 
 ```
 norm.ppf(1-(0.05/2))
 ```
-# 1.959963984540054 # Tells us what our critical value at 95% confidence is
+1.959963984540054 
+
+##### Tells us what our critical value at 95% confidence is
 1.959963984540054
 
 ##### n. What do the z-score and p-value you computed in the previous question mean for the conversion rates of the old and new pages? Do they agree with the findings in parts j. and k.?
