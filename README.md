@@ -317,26 +317,35 @@ user_id	timestamp	group	landing_page	converted
 2	661590	2017-01-11 16:55:06.154213	treatment	new_page	0
 3	853541	2017-01-08 18:28:03.143765	treatment	new_page	0
 4	864975	2017-01-21 01:52:26.210827	control	old_page	1
+
+```
 df2['intercept'] = 1
 
 df2[['drop', 'ab_page']] = pd.get_dummies(df2['group'])
 df2.drop(['drop'], axis=1, inplace=True)
 df2.head()
+```
 user_id	timestamp	group	landing_page	converted	intercept	ab_page
 0	851104	2017-01-21 22:11:48.556739	control	old_page	0	1	0
 1	804228	2017-01-12 08:01:45.159739	control	old_page	0	1	0
 2	661590	2017-01-11 16:55:06.154213	treatment	new_page	0	1	1
 3	853541	2017-01-08 18:28:03.143765	treatment	new_page	0	1	1
 4	864975	2017-01-21 01:52:26.210827	control	old_page	1	1	0
-c. Use statsmodels to import your regression model. Instantiate the model, and fit the model using the two columns you created in part b. to predict whether or not an individual converts.
 
+##### c. Use statsmodels to import your regression model. Instantiate the model, and fit the model using the two columns you created in part b. to predict whether or not an individual converts.
+
+```
 import statsmodels.api as sm
 
 logit_mod = sm.Logit(df2['converted'], df2[['intercept', 'ab_page']])
-d. Provide the summary of your model below, and use it as necessary to answer the following questions.
+```
 
+##### d. Provide the summary of your model below, and use it as necessary to answer the following questions.
+
+```
 results = logit_mod.fit()
 results.summary()
+```
 Optimization terminated successfully.
          Current function value: 0.366118
          Iterations 6
@@ -351,34 +360,40 @@ LLR p-value:	0.1899
 coef	std err	z	P>|z|	[0.025	0.975]
 intercept	-1.9888	0.008	-246.669	0.000	-2.005	-1.973
 ab_page	-0.0150	0.011	-1.311	0.190	-0.037	0.007
-e. What is the p-value associated with ab_page? Why does it differ from the value you found in the Part II?
 
-Hint: What are the null and alternative hypotheses associated with your regression model, and how do they compare to the null and alternative hypotheses in the Part II?
+##### e. What is the p-value associated with ab_page? Why does it differ from the value you found in the Part II?
+
+##### Hint: What are the null and alternative hypotheses associated with your regression model, and how do they compare to the null and alternative hypotheses in the Part II?
 
 The p-value associated with ab_page is 0.190 which is different from the p-value of 0.9048 in Part II due to the different hypotheses.
 
 In Part II, unless the new page indicates a higher conversion rate, we will keep the current page. In Part III, a regression test is testing whether the independent variable has any effect.
 
-f. Now, you are considering other things that might influence whether or not an individual converts. Discuss why it is a good idea to consider other factors to add into your regression model. Are there any disadvantages to adding additional terms into your regression model?
+##### f. Now, you are considering other things that might influence whether or not an individual converts. Discuss why it is a good idea to consider other factors to add into your regression model. Are there any disadvantages to adding additional terms into your regression model?
 
 Other factors adding into the regression model such as location, gender, date and time would be good ideas to consider as they will have some effects. However, adding more factors will make the model complicated and may not interpret the data clearly.
 
-g. Now along with testing if the conversion rate changes for different pages, also add an effect based on which country a user lives. You will need to read in the countries.csv dataset and merge together your datasets on the approporiate rows. Here are the docs for joining tables.
+##### g. Now along with testing if the conversion rate changes for different pages, also add an effect based on which country a user lives. You will need to read in the countries.csv dataset and merge together your datasets on the approporiate rows. Here are the docs for joining tables.
 
 Does it appear that country had an impact on conversion? Don't forget to create dummy variables for these country columns - Hint: You will need two columns for the three dummy varaibles. Provide the statistical output as well as a written response to answer this question.
 
+```
 c_df = pd.read_csv('countries.csv')
 C_df2 = c_df.set_index('user_id').join(df2.set_index('user_id'), how='inner')
 
 c_df2.head(2)
+```
 user_id	timestamp	group	landing_page	converted	intercept	ab_page	country	CA	UK	US	UK_new_page	US_new_page
 0	851104	2017-01-21 22:11:48.556739	control	old_page	0	1	0	US	0	0	1	0	0
 1	804228	2017-01-12 08:01:45.159739	control	old_page	0	1	0	US	0	0	1	0	0
-# Create dummy variables
+##### Create dummy variables
+
+```
 c_df2[['CA', 'UK', 'US']] = pd.get_dummies(c_df2['country'])
 logit_mod_new = sm.Logit(c_df2['converted'],c_df2[['intercept', 'ab_page', 'US', 'UK']])
 results_new = logit_mod_new.fit()
 results_new.summary()
+```
 Optimization terminated successfully.
          Current function value: 0.366113
          Iterations 6
@@ -399,25 +414,32 @@ np.exp(-0.0149),np.exp(0.0506),np.exp(0.0408)
 (0.9852104557227469, 1.0519020483004984, 1.0416437559600236)
 1/np.exp(-0.0149)
 1.0150115583846535
+
 The p_values exceed 5% which are not significant. we fail to reject the null hypothesis. The new_page is not significantly better than the current one.
 
-h. Though you have now looked at the individual factors of country and page on conversion, we would now like to look at an interaction between page and country to see if there significant effects on conversion. Create the necessary additional columns, and fit the new model.
+##### h. Though you have now looked at the individual factors of country and page on conversion, we would now like to look at an interaction between page and country to see if there significant effects on conversion. Create the necessary additional columns, and fit the new model.
 
-Provide the summary results, and your conclusions based on the results.
+##### Provide the summary results, and your conclusions based on the results.
 
+```
 c_df2['UK_new_page'] = c_df2['ab_page']* c_df2['UK']
 c_df2['US_new_page'] = c_df2['ab_page']* c_df2['US']
 c_df2.head()
+```
 user_id	timestamp	group	landing_page	converted	intercept	ab_page	country	CA	UK	US	UK_new_page	US_new_page
 0	851104	2017-01-21 22:11:48.556739	control	old_page	0	1	0	US	0	0	1	0	0
 1	804228	2017-01-12 08:01:45.159739	control	old_page	0	1	0	US	0	0	1	0	0
 2	661590	2017-01-11 16:55:06.154213	treatment	new_page	0	1	1	US	0	0	1	0	1
 3	853541	2017-01-08 18:28:03.143765	treatment	new_page	0	1	1	US	0	0	1	0	1
 4	864975	2017-01-21 01:52:26.210827	control	old_page	1	1	0	US	0	0	1	0	0
-#Linear Model
+
+##### Linear Model
+
+```
 lin_mod = sm.OLS(c_df2['converted'], c_df2[['intercept', 'ab_page', 'US', 'US_new_page', 'UK', 'UK_new_page']])
 results = lin_mod.fit()
 results.summary()
+```
 OLS Regression Results
 Dep. Variable:	converted	R-squared:	0.000
 Model:	OLS	Adj. R-squared:	0.000
@@ -447,4 +469,5 @@ US_new_page    1.004727
 UK             1.001240
 UK_new_page    1.008062
 dtype: float64
+
 The p_values are not significant. we fail to reject the null hypothesis. The new_page is not significantly better than the current one.
